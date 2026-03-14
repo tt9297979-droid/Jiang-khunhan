@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>JIANG RACING GARAGE</title>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#0a0a0a;
+color:white;
+overflow-x:hidden;
+}
+
+body::before{
+content:"ช่างเจียงขุนหาญ";
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:140px;
+color:rgba(255,255,255,0.04);
+pointer-events:none;
+}
+
+header{
+background:black;
+padding:25px;
+text-align:center;
+border-bottom:2px solid red;
+}
+
+nav button{
+margin:5px;
+padding:10px 15px;
+background:#111;
+color:white;
+border:1px solid red;
+cursor:pointer;
+}
+
+nav button:hover{
+background:red;
+}
+
+section{
+display:none;
+padding:40px;
+max-width:1200px;
+margin:auto;
+}
+
+.active{
+display:block;
+}
+
+.card{
+background:#111;
+padding:20px;
+border-radius:10px;
+margin:20px 0;
+}
+
+input{
+padding:10px;
+margin:5px;
+background:#000;
+border:1px solid #444;
+color:white;
+}
+
+button.action{
+background:red;
+border:none;
+padding:10px 20px;
+cursor:pointer;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+td,th{
+border:1px solid #333;
+padding:10px;
+text-align:center;
+}
+
+#engine3d{
+width:100%;
+height:400px;
+}
+
+.contactBtn{
+position:fixed;
+bottom:20px;
+right:20px;
+background:red;
+padding:15px;
+border-radius:50%;
+cursor:pointer;
+}
+
+.popup{
+display:none;
+position:fixed;
+bottom:80px;
+right:20px;
+background:#111;
+padding:20px;
+border:1px solid red;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>🏁 JIANG RACING GARAGE</h1>
+<p>สำนักแต่งรถ Wave / Sonic / MSX</p>
+
+<nav>
+
+<button onclick="showPage('home')">หน้าแรก</button>
+<button onclick="showPage('cc')">คำนวณ CC</button>
+<button onclick="showPage('dyno')">Dyno</button>
+<button onclick="showPage('recipes')">สูตรแต่ง</button>
+<button onclick="showPage('bikes')">ฐานข้อมูล</button>
+<button onclick="showPage('booking')">จองคิว</button>
+
+</nav>
+
+</header>
+
+<section id="home" class="active">
+
+<div class="card">
+
+<h2>เครื่องยนต์จำลอง</h2>
+
+<div id="engine3d"></div>
+
+</div>
+
+</section>
+
+<section id="cc">
+
+<div class="card">
+
+<h2>คำนวณ CC</h2>
+
+<input id="bore" placeholder="Bore mm">
+<input id="stroke" placeholder="Stroke mm">
+
+<button class="action" onclick="calcCC()">คำนวณ</button>
+
+<p id="ccResult"></p>
+
+</div>
+
+</section>
+
+<section id="dyno">
+
+<div class="card">
+
+<h2>Dyno Simulator</h2>
+
+<canvas id="dynoChart"></canvas>
+
+<button class="action" onclick="runDyno()">จำลอง Dyno</button>
+
+</div>
+
+</section>
+
+<section id="recipes">
+
+<div class="card">
+
+<h2>สูตรแต่ง Wave 110i</h2>
+
+<table>
+
+<tr>
+<th>ลูก</th>
+<th>ชัก</th>
+<th>วาล์ว</th>
+<th>ลิ้น</th>
+<th>ปลาย</th>
+</tr>
+
+<tr><td>53</td><td>เดิม</td><td>23/20</td><td>26</td><td>120</td></tr>
+<tr><td>54</td><td>เดิม</td><td>23/20</td><td>28</td><td>120</td></tr>
+<tr><td>55</td><td>+2</td><td>24/21</td><td>28</td><td>125</td></tr>
+<tr><td>56</td><td>+3</td><td>25/22</td><td>30</td><td>135</td></tr>
+<tr><td>57</td><td>+3</td><td>26/23</td><td>30</td><td>140</td></tr>
+<tr><td>58</td><td>+5</td><td>27/23</td><td>32</td><td>145</td></tr>
+<tr><td>59</td><td>+5</td><td>28/24</td><td>32</td><td>150</td></tr>
+<tr><td>60</td><td>+5</td><td>29/25</td><td>32</td><td>155</td></tr>
+
+</table>
+
+</div>
+
+<div class="card">
+
+<h2>สูตรแต่ง Wave 125</h2>
+
+<table>
+
+<tr>
+<th>ลูก</th>
+<th>ชัก</th>
+<th>วาล์ว</th>
+<th>ลิ้น</th>
+<th>ปลาย</th>
+</tr>
+
+<tr><td>54</td><td>เดิม</td><td>24/21</td><td>28</td><td>120</td></tr>
+<tr><td>56</td><td>เดิม</td><td>25/22</td><td>28</td><td>125</td></tr>
+<tr><td>57</td><td>+2</td><td>26/23</td><td>30</td><td>130</td></tr>
+<tr><td>59</td><td>+3</td><td>27/23</td><td>30</td><td>140</td></tr>
+<tr><td>60</td><td>+3</td><td>28/24</td><td>30</td><td>145</td></tr>
+
+</table>
+
+</div>
+
+</section>
+
+<section id="bikes">
+
+<div class="card">
+
+<h2>ฐานข้อมูลรถ</h2>
+
+<table>
+
+<tr>
+<th>รุ่น</th>
+<th>CC</th>
+<th>Bore</th>
+<th>Stroke</th>
+</tr>
+
+<tr><td>Wave110i</td><td>109</td><td>50</td><td>55.6</td></tr>
+<tr><td>Wave125i</td><td>124</td><td>52.4</td><td>57.9</td></tr>
+<tr><td>Sonic125</td><td>124</td><td>54</td><td>54.5</td></tr>
+<tr><td>MSX125</td><td>124</td><td>52.4</td><td>57.9</td></tr>
+
+</table>
+
+</div>
+
+</section>
+
+<section id="booking">
+
+<div class="card">
+
+<h2>จองคิวซ่อม</h2>
+
+<input id="name" placeholder="ชื่อ">
+<input id="bike" placeholder="รุ่นรถ">
+<input type="date" id="date">
+
+<button class="action" onclick="book()">จองคิว</button>
+
+<ul id="queue"></ul>
+
+</div>
+
+</section>
+
+<div class="contactBtn" onclick="togglePopup()">💬</div>
+
+<div class="popup" id="popup">
+
+<a href="https://www.facebook.com/share/1amDm6LxUw/" target="_blank">ช่างเจียงจะเนียว</a>
+<br><br>
+<a href="https://www.facebook.com/share/1CLzdS7JkT/" target="_blank">วินโมโตเทคขุนหาญ</a>
+
+</div>
+
+<script>
+
+function showPage(id){
+
+document.querySelectorAll("section").forEach(s=>s.classList.remove("active"))
+
+document.getElementById(id).classList.add("active")
+
+}
+
+let currentCC=125
+
+function calcCC(){
+
+let bore=document.getElementById("bore").value
+let stroke=document.getElementById("stroke").value
+
+let cc=(Math.PI/4)*bore*bore*stroke/1000
+
+currentCC=cc
+
+document.getElementById("ccResult").innerText="CC = "+cc.toFixed(2)
+
+}
+
+function runDyno(){
+
+let rpm=[2000,4000,6000,8000,10000]
+
+let hp=rpm.map(r=> (currentCC/10)*(r/10000) )
+
+new Chart(document.getElementById("dynoChart"),{
+
+type:"line",
+
+data:{
+labels:rpm,
+datasets:[{label:"HP",data:hp}]
+}
+
+})
+
+}
+
+let queue=[]
+
+function book(){
+
+let name=document.getElementById("name").value
+let bike=document.getElementById("bike").value
+let date=document.getElementById("date").value
+
+queue.push(name+" "+bike+" "+date)
+
+let list=document.getElementById("queue")
+
+list.innerHTML=""
+
+queue.forEach(q=>{
+
+list.innerHTML+="<li>"+q+"</li>"
+
+})
+
+}
+
+function togglePopup(){
+
+let p=document.getElementById("popup")
+
+p.style.display=p.style.display=="block"?"none":"block"
+
+}
+
+/* 3D piston */
+
+const scene=new THREE.Scene()
+
+const camera=new THREE.PerspectiveCamera(75,window.innerWidth/400,0.1,1000)
+
+const renderer=new THREE.WebGLRenderer({alpha:true})
+
+renderer.setSize(window.innerWidth,400)
+
+document.getElementById("engine3d").appendChild(renderer.domElement)
+
+const cylinderGeo=new THREE.CylinderGeometry(1,1,3,32,true)
+
+const cylinderMat=new THREE.MeshBasicMaterial({color:0xaaaaaa,wireframe:true})
+
+const cylinder=new THREE.Mesh(cylinderGeo,cylinderMat)
+
+scene.add(cylinder)
+
+const pistonGeo=new THREE.CylinderGeometry(0.9,0.9,0.5,32)
+
+const pistonMat=new THREE.MeshStandardMaterial({color:0xff0000})
+
+const piston=new THREE.Mesh(pistonGeo,pistonMat)
+
+scene.add(piston)
+
+const light=new THREE.PointLight(0xffffff,1)
+
+light.position.set(5,5,5)
+
+scene.add(light)
+
+camera.position.z=5
+
+let t=0
+
+function animate(){
+
+requestAnimationFrame(animate)
+
+t+=0.05
+
+piston.position.y=Math.sin(t)*1
+
+renderer.render(scene,camera)
+
+}
+
+animate()
+
+</script>
+
+</body>
+</html>
