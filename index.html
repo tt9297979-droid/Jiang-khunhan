@@ -1,425 +1,250 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
+
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>JIANG RACING GARAGE</title>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Gaming Topup Platform</title>
 
 <style>
 
 body{
 margin:0;
 font-family:Arial;
-background:#0a0a0a;
+background:linear-gradient(135deg,#0f172a,#020617);
 color:white;
 overflow-x:hidden;
 }
 
-body::before{
-content:"ช่างเจียงขุนหาญ";
+/* background animation */
+
+body:before{
+content:"";
 position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-font-size:140px;
-color:rgba(255,255,255,0.04);
-pointer-events:none;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle at 20% 30%,#1e293b,transparent),
+radial-gradient(circle at 80% 70%,#0ea5e9,transparent);
+animation:bgmove 10s infinite alternate;
+z-index:-1;
+}
+
+@keyframes bgmove{
+
+0%{transform:scale(1)}
+100%{transform:scale(1.3)}
+
 }
 
 header{
-background:black;
-padding:25px;
+
 text-align:center;
-border-bottom:2px solid red;
+padding:30px;
+font-size:35px;
+font-weight:bold;
+
 }
 
-nav button{
-margin:5px;
-padding:10px 15px;
-background:#111;
+nav{
+
+display:flex;
+justify-content:center;
+gap:20px;
+margin-bottom:20px;
+
+}
+
+button{
+
+padding:10px 20px;
+border:none;
+border-radius:8px;
+background:#22c55e;
 color:white;
-border:1px solid red;
 cursor:pointer;
+font-size:15px;
+
 }
 
-nav button:hover{
-background:red;
+button:hover{
+
+background:#16a34a;
+transform:scale(1.05);
+
 }
 
-section{
+#games{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+padding:30px;
+
+}
+
+.game{
+
+background:#1e293b;
+padding:20px;
+border-radius:12px;
+text-align:center;
+transition:0.3s;
+
+}
+
+.game:hover{
+
+transform:translateY(-5px);
+background:#334155;
+
+}
+
+.dashboard{
+
+padding:30px;
 display:none;
-padding:40px;
-max-width:1200px;
-margin:auto;
-}
 
-.active{
-display:block;
 }
 
 .card{
-background:#111;
+
+background:#1e293b;
 padding:20px;
 border-radius:10px;
-margin:20px 0;
-}
+margin:10px;
 
-input{
-padding:10px;
-margin:5px;
-background:#000;
-border:1px solid #444;
-color:white;
-}
-
-button.action{
-background:red;
-border:none;
-padding:10px 20px;
-cursor:pointer;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-}
-
-td,th{
-border:1px solid #333;
-padding:10px;
-text-align:center;
-}
-
-#engine3d{
-width:100%;
-height:400px;
-}
-
-.contactBtn{
-position:fixed;
-bottom:20px;
-right:20px;
-background:red;
-padding:15px;
-border-radius:50%;
-cursor:pointer;
-}
-
-.popup{
-display:none;
-position:fixed;
-bottom:80px;
-right:20px;
-background:#111;
-padding:20px;
-border:1px solid red;
 }
 
 </style>
+
 </head>
 
 <body>
 
 <header>
-
-<h1>🏁 JIANG RACING GARAGE</h1>
-<p>สำนักแต่งรถ Wave / Sonic / MSX</p>
+🎮 GAMING TOPUP PLATFORM
+</header>
 
 <nav>
 
-<button onclick="showPage('home')">หน้าแรก</button>
-<button onclick="showPage('cc')">คำนวณ CC</button>
-<button onclick="showPage('dyno')">Dyno</button>
-<button onclick="showPage('recipes')">สูตรแต่ง</button>
-<button onclick="showPage('bikes')">ฐานข้อมูล</button>
-<button onclick="showPage('booking')">จองคิว</button>
+<button onclick="showGames()">🎮 Games</button>
+<button onclick="showDashboard()">📊 Dashboard</button>
+<button onclick="login()">👤 Login</button>
 
 </nav>
 
-</header>
+<div id="games"></div>
 
-<section id="home" class="active">
-
-<div class="card">
-
-<h2>เครื่องยนต์จำลอง</h2>
-
-<div id="engine3d"></div>
-
-</div>
-
-</section>
-
-<section id="cc">
+<div id="dashboard" class="dashboard">
 
 <div class="card">
-
-<h2>คำนวณ CC</h2>
-
-<input id="bore" placeholder="Bore mm">
-<input id="stroke" placeholder="Stroke mm">
-
-<button class="action" onclick="calcCC()">คำนวณ</button>
-
-<p id="ccResult"></p>
-
-</div>
-
-</section>
-
-<section id="dyno">
-
-<div class="card">
-
-<h2>Dyno Simulator</h2>
-
-<canvas id="dynoChart"></canvas>
-
-<button class="action" onclick="runDyno()">จำลอง Dyno</button>
-
-</div>
-
-</section>
-
-<section id="recipes">
-
-<div class="card">
-
-<h2>สูตรแต่ง Wave 110i</h2>
-
-<table>
-
-<tr>
-<th>ลูก</th>
-<th>ชัก</th>
-<th>วาล์ว</th>
-<th>ลิ้น</th>
-<th>ปลาย</th>
-</tr>
-
-<tr><td>53</td><td>เดิม</td><td>23/20</td><td>26</td><td>120</td></tr>
-<tr><td>54</td><td>เดิม</td><td>23/20</td><td>28</td><td>120</td></tr>
-<tr><td>55</td><td>+2</td><td>24/21</td><td>28</td><td>125</td></tr>
-<tr><td>56</td><td>+3</td><td>25/22</td><td>30</td><td>135</td></tr>
-<tr><td>57</td><td>+3</td><td>26/23</td><td>30</td><td>140</td></tr>
-<tr><td>58</td><td>+5</td><td>27/23</td><td>32</td><td>145</td></tr>
-<tr><td>59</td><td>+5</td><td>28/24</td><td>32</td><td>150</td></tr>
-<tr><td>60</td><td>+5</td><td>29/25</td><td>32</td><td>155</td></tr>
-
-</table>
-
+💰 รายได้วันนี้: <span id="income">0</span> บาท
 </div>
 
 <div class="card">
-
-<h2>สูตรแต่ง Wave 125</h2>
-
-<table>
-
-<tr>
-<th>ลูก</th>
-<th>ชัก</th>
-<th>วาล์ว</th>
-<th>ลิ้น</th>
-<th>ปลาย</th>
-</tr>
-
-<tr><td>54</td><td>เดิม</td><td>24/21</td><td>28</td><td>120</td></tr>
-<tr><td>56</td><td>เดิม</td><td>25/22</td><td>28</td><td>125</td></tr>
-<tr><td>57</td><td>+2</td><td>26/23</td><td>30</td><td>130</td></tr>
-<tr><td>59</td><td>+3</td><td>27/23</td><td>30</td><td>140</td></tr>
-<tr><td>60</td><td>+3</td><td>28/24</td><td>30</td><td>145</td></tr>
-
-</table>
-
+🎮 จำนวนออเดอร์: <span id="orders">0</span>
 </div>
-
-</section>
-
-<section id="bikes">
-
-<div class="card">
-
-<h2>ฐานข้อมูลรถ</h2>
-
-<table>
-
-<tr>
-<th>รุ่น</th>
-<th>CC</th>
-<th>Bore</th>
-<th>Stroke</th>
-</tr>
-
-<tr><td>Wave110i</td><td>109</td><td>50</td><td>55.6</td></tr>
-<tr><td>Wave125i</td><td>124</td><td>52.4</td><td>57.9</td></tr>
-<tr><td>Sonic125</td><td>124</td><td>54</td><td>54.5</td></tr>
-<tr><td>MSX125</td><td>124</td><td>52.4</td><td>57.9</td></tr>
-
-</table>
-
-</div>
-
-</section>
-
-<section id="booking">
-
-<div class="card">
-
-<h2>จองคิวซ่อม</h2>
-
-<input id="name" placeholder="ชื่อ">
-<input id="bike" placeholder="รุ่นรถ">
-<input type="date" id="date">
-
-<button class="action" onclick="book()">จองคิว</button>
-
-<ul id="queue"></ul>
-
-</div>
-
-</section>
-
-<div class="contactBtn" onclick="togglePopup()">💬</div>
-
-<div class="popup" id="popup">
-
-<a href="https://www.facebook.com/share/1amDm6LxUw/" target="_blank">ช่างเจียงจะเนียว</a>
-<br><br>
-<a href="https://www.facebook.com/share/1CLzdS7JkT/" target="_blank">วินโมโตเทคขุนหาญ</a>
 
 </div>
 
 <script>
 
-function showPage(id){
+let income=0
+let orders=0
 
-document.querySelectorAll("section").forEach(s=>s.classList.remove("active"))
+const games=[
 
-document.getElementById(id).classList.add("active")
+"Free Fire",
+"Roblox",
+"PUBG Mobile",
+"Call of Duty Mobile",
+"ROV",
+"Genshin Impact",
+"Mobile Legends",
+"Honkai Star Rail",
+"Valorant",
+"Steam Wallet",
+"Clash of Clans",
+"Clash Royale",
+"FIFA Mobile",
+"League of Legends",
+"Apex Legends",
+"Fortnite",
+"Garena Undawn",
+"Dragon Raja",
+"Tower of Fantasy",
+"Black Desert Mobile"
 
-}
+]
 
-let currentCC=125
+function showGames(){
 
-function calcCC(){
+document.getElementById("dashboard").style.display="none"
 
-let bore=document.getElementById("bore").value
-let stroke=document.getElementById("stroke").value
+let html=""
 
-let cc=(Math.PI/4)*bore*bore*stroke/1000
+games.forEach(g=>{
 
-currentCC=cc
+html+=`
 
-document.getElementById("ccResult").innerText="CC = "+cc.toFixed(2)
+<div class="game">
 
-}
+<h3>${g}</h3>
 
-function runDyno(){
+<button onclick="topup('${g}')">
+💳 เติมเงิน
+</button>
 
-let rpm=[2000,4000,6000,8000,10000]
+</div>
 
-let hp=rpm.map(r=> (currentCC/10)*(r/10000) )
-
-new Chart(document.getElementById("dynoChart"),{
-
-type:"line",
-
-data:{
-labels:rpm,
-datasets:[{label:"HP",data:hp}]
-}
-
-})
-
-}
-
-let queue=[]
-
-function book(){
-
-let name=document.getElementById("name").value
-let bike=document.getElementById("bike").value
-let date=document.getElementById("date").value
-
-queue.push(name+" "+bike+" "+date)
-
-let list=document.getElementById("queue")
-
-list.innerHTML=""
-
-queue.forEach(q=>{
-
-list.innerHTML+="<li>"+q+"</li>"
+`
 
 })
 
-}
-
-function togglePopup(){
-
-let p=document.getElementById("popup")
-
-p.style.display=p.style.display=="block"?"none":"block"
+document.getElementById("games").innerHTML=html
 
 }
 
-/* 3D piston */
+function showDashboard(){
 
-const scene=new THREE.Scene()
+document.getElementById("games").innerHTML=""
 
-const camera=new THREE.PerspectiveCamera(75,window.innerWidth/400,0.1,1000)
+document.getElementById("dashboard").style.display="block"
 
-const renderer=new THREE.WebGLRenderer({alpha:true})
-
-renderer.setSize(window.innerWidth,400)
-
-document.getElementById("engine3d").appendChild(renderer.domElement)
-
-const cylinderGeo=new THREE.CylinderGeometry(1,1,3,32,true)
-
-const cylinderMat=new THREE.MeshBasicMaterial({color:0xaaaaaa,wireframe:true})
-
-const cylinder=new THREE.Mesh(cylinderGeo,cylinderMat)
-
-scene.add(cylinder)
-
-const pistonGeo=new THREE.CylinderGeometry(0.9,0.9,0.5,32)
-
-const pistonMat=new THREE.MeshStandardMaterial({color:0xff0000})
-
-const piston=new THREE.Mesh(pistonGeo,pistonMat)
-
-scene.add(piston)
-
-const light=new THREE.PointLight(0xffffff,1)
-
-light.position.set(5,5,5)
-
-scene.add(light)
-
-camera.position.z=5
-
-let t=0
-
-function animate(){
-
-requestAnimationFrame(animate)
-
-t+=0.05
-
-piston.position.y=Math.sin(t)*1
-
-renderer.render(scene,camera)
+document.getElementById("income").innerText=income
+document.getElementById("orders").innerText=orders
 
 }
 
-animate()
+function topup(game){
+
+let amount=prompt("เติมเงิน "+game+" จำนวนบาท")
+
+if(!amount)return
+
+alert("สร้าง QR PromptPay สำหรับ "+amount+" บาท")
+
+income+=parseInt(amount)
+orders++
+
+}
+
+function login(){
+
+let user=prompt("Username")
+
+if(user){
+
+alert("ยินดีต้อนรับ "+user)
+
+}
+
+}
+
+showGames()
 
 </script>
 
